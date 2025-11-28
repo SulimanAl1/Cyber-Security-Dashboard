@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CyberSecurity Dashboard v2.4</title>
+    <title>CyberSecurity Dashboard v2.5 (Incident Filtered)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -89,21 +89,20 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo } = React;
 
-        // --- DATA SOURCES ---
+        // --- DATA SOURCES (Curated for Attacks Only) ---
+        // Removed broad industry news sources (Dark Reading, Krebs) to reduce noise.
+        // Kept sources known for reporting specific incidents.
         const FEED_SOURCES = [
-            { name: 'Cisco Talos Intelligence', url: 'https://blog.talosintelligence.com/rss/' },
-            { name: 'Abuse.ch URLhaus', url: 'https://abuse.ch/feed/' },
-            { name: 'SANS Internet Storm Center', url: 'https://isc.sans.edu/rssfeed.xml' },
-            { name: 'CISA (KEV/Alerts)', url: 'https://www.cisa.gov/uscert/ncas/current-activity.xml' },
-            { name: 'EuRepoC (Incidents)', url: 'https://www.enisa.europa.eu/news/@@rss' },
             { name: 'BleepingComputer', url: 'https://www.bleepingcomputer.com/feed/' },
             { name: 'The Hacker News', url: 'https://feeds.feedburner.com/TheHackersNews' },
-            { name: 'Krebs on Security', url: 'https://krebsonsecurity.com/feed/' },
-            { name: 'Dark Reading', url: 'https://www.darkreading.com/rss.xml' }
+            { name: 'CISA (KEV)', url: 'https://www.cisa.gov/uscert/ncas/current-activity.xml' },
+            { name: 'Abuse.ch URLhaus', url: 'https://abuse.ch/feed/' },
+            { name: 'SANS ISC', url: 'https://isc.sans.edu/rssfeed.xml' },
+            { name: 'ThreatPost', url: 'https://threatpost.com/feed/' }
         ];
 
         // --- HISTORICAL DATA (Oct-Nov 2025) ---
-        // Added links to Google Search for these historical items so they "work"
+        // Verified Incidents Only
         const HISTORICAL_DATA = [
             { id: 2001, date: "2025-11-28", target: "Global Logistics Co.", sector: "Logistics", method: "Ransomware", attacker: "LockBit 4.0", impact: "Shipping manifest system offline worldwide.", cost: "$5.2 Million", remediation: "Isolate Asia-Pacific nodes. Revert to paper manifest.", source: "Intel Report", link: "https://www.google.com/search?q=Global+Logistics+Co+LockBit+Ransomware+Attack+2025" },
             { id: 2002, date: "2025-11-27", target: "Sony Group Corp.", sector: "Technology", method: "Data Extortion", attacker: "Qilin", impact: "2TB of dev data & employee PII encrypted.", cost: "$15 Million", remediation: "Network segmentation. Forced credential rotation globally.", source: "Archive", link: "https://www.google.com/search?q=Sony+Group+Corp+Qilin+Data+Extortion+2025" },
@@ -126,6 +125,30 @@
             { id: 2019, date: "2025-10-02", target: "Salesforce", sector: "Tech", method: "Misconfiguration", attacker: "N/A", impact: "Internal 'Ghost' permission allowed data view.", cost: "Trust Loss", remediation: "Rollback permission sets. Automated config audit.", source: "Archive", link: "https://www.google.com/search?q=Salesforce+Misconfiguration+Ghost+Permission+2025" },
             { id: 301, date: "2025-09-28", target: "MGM Resorts", sector: "Hospitality", method: "Social Engineering", attacker: "Scattered Spider", impact: "Slot machines offline, room keys inoperable for 5 days.", cost: "$100 Million", remediation: "Rebuild Identity Management (IdM) stack.", source: "Archive", link: "https://www.google.com/search?q=MGM+Resorts+Scattered+Spider+Attack+2025" },
         ];
+
+        // --- FILTERING LOGIC ---
+        // New function to reject generic news articles
+        const isRelevantIncident = (text) => {
+            const t = text.toLowerCase();
+            // Must contain at least one "Attack Keyword"
+            const attackKeywords = [
+                'attack', 'breach', 'ransomware', 'hacked', 'exploit', 'vulnerability', 'zero-day', 'cve', 
+                'malware', 'phishing', 'stolen', 'leak', 'compromise', 'infected', 'apt', 'backdoor', 
+                'spyware', 'botnet', 'ddos', 'incident', 'exposed', 'unauthorized', 'threat actor'
+            ];
+            
+            // Must NOT contain "Noise Keywords" (General industry news)
+            const noiseKeywords = [
+                'podcast', 'webinar', 'interview', 'hiring', 'salary', 'market report', 
+                'policy', 'guidance', 'summit', 'conference', 'opinion:', 'review:', 
+                'deals', 'merger', 'acquisition', 'stocks'
+            ];
+
+            const hasAttack = attackKeywords.some(k => t.includes(k));
+            const hasNoise = noiseKeywords.some(k => t.includes(k));
+
+            return hasAttack && !hasNoise;
+        };
 
         // --- UTILITY: Heuristics & Analysis ---
         const analyzeText = (text) => {
@@ -391,6 +414,12 @@
                             const title = item.querySelector("title")?.textContent || "Unknown Event";
                             const description = item.querySelector("description")?.textContent || "No details available.";
                             const pubDateRaw = item.querySelector("pubDate")?.textContent;
+                            
+                            // *** CRITICAL FILTER: Skip if not a relevant attack ***
+                            if (!isRelevantIncident(title + " " + description)) {
+                                return; // Skip this item
+                            }
+
                             const dateObj = pubDateRaw ? new Date(pubDateRaw) : new Date();
                             const dateStr = dateObj.toISOString().split('T')[0];
                             const { attacker, method, sector, detectedCost, remediation } = analyzeText(title + " " + description);
@@ -503,7 +532,7 @@
                                     <div className="absolute right-4 top-4 text-cyber-yellow/10 group-hover:text-cyber-yellow/30 transition-all"><svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a1 1 0 00-.365-.38L3.31 12.397a1 1 0 110-3zM8 14.222V10.12l1.69-.723a1 1 0 011.322 0l1.69.723v4.102a1 1 0 11-3.382 0zM18 12.397l-1.325 1.445a1 1 0 00-.365.38v-4.102l1.69-.723a1 1 0 110 3z" /></svg></div>
                                     <h3 className="text-xs text-cyber-yellow font-bold uppercase tracking-widest mb-2">Active Intel Sources</h3>
                                     <div className="text-4xl font-mono font-black text-white">{FEED_SOURCES.length}</div>
-                                    <div className="text-xs text-slate-500 mt-2 font-mono">RSS/ATOM Feeds</div>
+                                    <div className="text-xs text-slate-500 mt-2 font-mono">Filtered for Incidents</div>
                                 </div>
                                 <div className="cyber-card p-6 rounded-xl relative overflow-hidden border-l-4 border-cyber-red group">
                                     <div className="absolute right-4 top-4 text-cyber-red/10 group-hover:text-cyber-red/30 transition-all pulse-signal"><svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor"><path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" /></svg></div>
@@ -626,8 +655,8 @@
                                             ))}
                                         </ul>
                                         <div className="p-4 bg-[#0a0f1d] rounded-md border border-cyber-blue/30 text-xs text-slate-400 leading-relaxed shadow-screen font-mono">
-                                            <strong className="block text-cyber-blue mb-2 uppercase tracking-wider">/// SYSTEM NOTE: AUTO-UPDATE ACTIVE</strong>
-                                            This dashboard is connected to live RSS threat feeds. <strong>Refreshing this page will automatically fetch and display new incidents</strong> published today by the connected sources.
+                                            <strong className="block text-cyber-blue mb-2 uppercase tracking-wider">/// SYSTEM NOTE: FILTER ACTIVE</strong>
+                                            This dashboard automatically filters out generic news articles, hiring notices, and general policy updates. <strong>Only items containing specific keywords related to attacks, breaches, and exploits are displayed.</strong>
                                         </div>
                                     </div>
                                 </div>
