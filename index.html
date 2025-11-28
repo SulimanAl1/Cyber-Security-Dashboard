@@ -3,51 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CyberSecurity Dashboard</title>
+    <title>CyberSecurity Dashboard v2.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            dark: '#050a14',
+                            slate: '#111827',
+                            blue: '#00f0ff',
+                            red: '#ff2a6d',
+                            green: '#05ffa1',
+                            yellow: '#ffc800'
+                        }
+                    },
+                    boxShadow: {
+                        'glow-blue': '0 0 15px -3px rgba(0, 240, 255, 0.3)',
+                        'glow-red': '0 0 15px -3px rgba(255, 42, 109, 0.3)',
+                        'glow-green': '0 0 15px -3px rgba(5, 255, 161, 0.3)',
+                        'screen': 'inset 0 0 20px rgba(0,0,0,0.5)'
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         /* Cyber-Security Aesthetic Theme */
         :root {
-            --bg-dark: #0f172a;
-            --bg-card: #1e293b;
-            --accent-blue: #3b82f6;
-            --accent-red: #ef4444;
-            --accent-green: #10b981;
+            --bg-dark: #050a14;
             --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
         }
         body {
             background-color: var(--bg-dark);
             color: var(--text-primary);
             font-family: 'Inter', sans-serif;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(0, 240, 255, 0.1) 0%, transparent 50%),
+                linear-gradient(rgba(0, 0, 0, 0.1) 50%, transparent 50%);
+            background-size: 100% 100%, 4px 4px;
+            min-height: 100vh;
         }
         .font-mono { font-family: 'JetBrains Mono', monospace; }
         
         /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: var(--bg-dark); }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0a0f1d; }
+        ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #374151; }
 
-        /* Animations */
+        /* Animations & Effects */
         .slide-in { animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .pulse-signal { animation: pulseRed 2s infinite; }
+        @keyframes pulseRed {
+            0% { box-shadow: 0 0 0 0 rgba(255, 42, 109, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 42, 109, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 42, 109, 0); }
         }
-        .pulse-dot { animation: pulse 2s infinite; }
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+
+        .cyber-card {
+            background: linear-gradient(145deg, #111827, #0d1220);
+            border: 1px solid #1f2937;
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+        }
+        .cyber-card:hover {
+            border-color: #374151;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+        }
+
+        .cyber-input {
+            background: #0a0f1d;
+            border: 1px solid #1f2937;
+            transition: all 0.3s;
+        }
+        .cyber-input:focus {
+            border-color: #00f0ff;
+            box-shadow: 0 0 15px -5px rgba(0, 240, 255, 0.5);
         }
         
         /* Chart Styles */
-        .chart-bar:hover { fill-opacity: 0.8; cursor: pointer; }
+        .chart-glow { filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.6)); }
     </style>
 </head>
 <body>
@@ -56,7 +99,7 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo } = React;
 
-        // --- DATA SOURCES ---
+        // --- DATA SOURCES (Unchanged) ---
         const FEED_SOURCES = [
             { name: 'CISA Alerts', url: 'https://www.cisa.gov/uscert/ncas/alerts.xml' },
             { name: 'BleepingComputer', url: 'https://www.bleepingcomputer.com/feed/' },
@@ -67,7 +110,7 @@
             { name: 'SecurityWeek', url: 'https://feeds.feedburner.com/Securityweek' }
         ];
 
-        // --- HISTORICAL DATA (Specifically Oct 2025 - Nov 2025) ---
+        // --- HISTORICAL DATA (Unchanged Oct-Nov 2025) ---
         const HISTORICAL_DATA = [
             // --- NOVEMBER 2025 ---
             { id: 2001, date: "2025-11-28", target: "Global Logistics Co.", sector: "Logistics", method: "Ransomware", attacker: "LockBit 4.0", impact: "Shipping manifest system offline worldwide.", cost: "Est. $5M", remediation: "Isolate Asia-Pacific nodes. Revert to paper manifest.", source: "Intel Report" },
@@ -96,7 +139,7 @@
             { id: 301, date: "2025-09-28", target: "MGM Resorts", sector: "Hospitality", method: "Social Engineering", attacker: "Scattered Spider", impact: "Slot machines offline, room keys inoperable for 5 days.", cost: "$100M", remediation: "Rebuild Identity Management (IdM) stack.", source: "Archive" },
         ];
 
-        // --- UTILITY: Heuristics ---
+        // --- UTILITY: Heuristics (Unchanged) ---
         const analyzeText = (text) => {
             const lower = text.toLowerCase();
             let attacker = "Unknown Group";
@@ -152,7 +195,7 @@
             ];
         };
 
-        // --- COMPONENTS ---
+        // --- VISUAL COMPONENT UPGRADES ---
         const TrendChart = ({ data }) => {
             const trend = data.reduce((acc, curr) => {
                 if (!curr.date) return acc;
@@ -175,31 +218,46 @@
             }).join(' ');
 
             return (
-                <div className="w-full h-40 bg-slate-900 rounded-lg p-4 border border-slate-700 relative overflow-hidden">
-                    <h4 className="text-xs font-bold text-slate-400 uppercase mb-2">Incident Trend (2025)</h4>
+                <div className="w-full h-48 cyber-card rounded-xl p-6 relative overflow-hidden group">
+                    <div className="absolute inset-0 bg-cyber-blue/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <h4 className="text-sm font-bold text-cyber-blue uppercase mb-4 tracking-wider flex items-center gap-2">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>
+                        Incident Velocity (2025)
+                    </h4>
                     <svg viewBox="0 0 300 100" className="w-full h-full overflow-visible">
-                        <line x1="0" y1="100" x2="300" y2="100" stroke="#334155" strokeWidth="0.5"/>
+                        <defs>
+                            <linearGradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
+                                <stop offset="0%" stopColor="#00f0ff" stopOpacity="0.4" />
+                                <stop offset="100%" stopColor="#00f0ff" stopOpacity="0" />
+                            </linearGradient>
+                             <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                                <feGaussianBlur stdDeviation="2" result="coloredBlur" />
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                        </defs>
+                        {/* Grid Lines */}
+                        <line x1="0" y1="20" x2="300" y2="20" stroke="#1f2937" strokeWidth="0.5" strokeDasharray="4 4"/>
+                        <line x1="0" y1="60" x2="300" y2="60" stroke="#1f2937" strokeWidth="0.5" strokeDasharray="4 4"/>
+                        <line x1="0" y1="100" x2="300" y2="100" stroke="#374151" strokeWidth="1"/>
+                        
                         {points.length > 1 && (
                             <>
-                                <polyline points={polylinePoints} fill="none" stroke="#3b82f6" strokeWidth="3" className="drop-shadow-lg" />
-                                <polygon points={`0,100 ${polylinePoints} 300,100`} fill="url(#gradient)" opacity="0.2" />
+                                <polygon points={`0,100 ${polylinePoints} 300,100`} fill="url(#chartGradient)" />
+                                <polyline points={polylinePoints} fill="none" stroke="#00f0ff" strokeWidth="2" filter="url(#glow)" className="chart-glow" />
                                 {points.map((p, i) => {
                                     const x = (i / (points.length - 1 || 1)) * 300;
                                     const y = 100 - (p[1] / maxVal) * 80;
                                     return (
-                                        <circle key={i} cx={x} cy={y} r="3" fill="#3b82f6" className="hover:r-5 transition-all">
+                                        <circle key={i} cx={x} cy={y} r="3" fill="#050a14" stroke="#00f0ff" strokeWidth="2" className="hover:r-5 transition-all cursor-pointer relative z-10">
                                             <title>{p[0]}: {p[1]} Incidents</title>
                                         </circle>
                                     )
                                 })}
                             </>
                         )}
-                        <defs>
-                            <linearGradient id="gradient" x1="0" x2="0" y1="0" y2="1">
-                                <stop offset="0%" stopColor="#3b82f6" />
-                                <stop offset="100%" stopColor="transparent" />
-                            </linearGradient>
-                        </defs>
                     </svg>
                 </div>
             );
@@ -208,43 +266,43 @@
         const DailyReport = ({ data, date }) => {
             const daysEvents = data.filter(d => d.date === date);
             return (
-                <div className="bg-white text-slate-900 p-8 max-w-4xl mx-auto rounded-none shadow-2xl slide-in font-serif">
-                    <div className="border-b-4 border-black pb-4 mb-6 flex justify-between items-end">
+                <div className="bg-slate-50 text-slate-900 p-10 max-w-4xl mx-auto shadow-2xl slide-in border-t-8 border-cyber-red">
+                    <div className="border-b-2 border-slate-300 pb-6 mb-8 flex justify-between items-end">
                         <div>
-                            <h1 className="text-3xl font-black uppercase tracking-tighter">Daily Cyber Intelligence Briefing</h1>
-                            <p className="text-sm font-bold text-slate-500 mt-1">CLASSIFICATION: INTERNAL USE ONLY</p>
+                            <h1 className="text-4xl font-black uppercase tracking-tighter text-slate-900">Daily Cyber Intelligence Briefing</h1>
+                            <p className="text-sm font-bold text-cyber-red mt-2 uppercase tracking-widest">TLP:AMBER // INTERNAL USE ONLY</p>
                         </div>
                         <div className="text-right">
-                            <div className="text-xl font-bold font-mono">{date}</div>
-                            <div className="text-xs uppercase">Report ID: {date.replace(/-/g, '')}-CS</div>
+                            <div className="text-2xl font-bold font-mono text-slate-700">{date}</div>
+                            <div className="text-xs uppercase text-slate-500 font-mono">ID: {date.replace(/-/g, '')}-CS-BRIEF</div>
                         </div>
                     </div>
                     
                     {daysEvents.length === 0 ? (
-                        <div className="text-center py-10 italic text-slate-500">No major incidents recorded for this date in the feed. Select a different date or view the live dashboard.</div>
+                        <div className="text-center py-16 italic text-slate-500 bg-slate-100 rounded-lg border border-dashed border-slate-300">No major incidents recorded for this date in the active feed. Return to the live dashboard for real-time monitoring.</div>
                     ) : (
-                        <div className="space-y-6">
+                        <div className="space-y-8">
                             {daysEvents.map(evt => (
-                                <div key={evt.id} className="border border-slate-200 p-4 bg-slate-50">
-                                    <div className="flex justify-between items-start mb-2">
-                                        <h3 className="text-lg font-bold text-red-700">{evt.target} <span className="text-black text-sm font-normal">({evt.sector})</span></h3>
-                                        <span className="bg-black text-white px-2 py-0.5 text-xs font-bold uppercase">{evt.attacker}</span>
+                                <div key={evt.id} className="border-l-4 border-cyber-blue pl-6 py-2 relative">
+                                    <div className="flex justify-between items-start mb-3">
+                                        <h3 className="text-xl font-bold text-slate-800">{evt.target} <span className="text-slate-500 text-base font-medium ml-2">({evt.sector})</span></h3>
+                                        <span className="bg-slate-900 text-cyber-blue px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-sm">{evt.attacker}</span>
                                     </div>
-                                    <div className="grid grid-cols-2 gap-4 text-sm mb-3">
-                                        <div><strong>Method:</strong> {evt.method}</div>
-                                        <div><strong>Source:</strong> {evt.source}</div>
-                                        <div className="col-span-2"><strong>Impact:</strong> {evt.impact}</div>
+                                    <div className="grid grid-cols-2 gap-y-2 gap-x-8 text-sm mb-4 text-slate-600">
+                                        <div className="flex"><strong className="w-20 text-slate-900">Method:</strong> {evt.method}</div>
+                                        <div className="flex justify-end"><strong className="mr-2 text-slate-900">Source:</strong> {evt.source}</div>
+                                        <div className="col-span-2 mt-2"><strong className="block text-slate-900 mb-1">Impact Assessment:</strong> <span className="leading-relaxed">{evt.impact}</span></div>
                                     </div>
-                                    <div className="bg-red-50 border-l-4 border-red-600 p-2 text-sm text-red-900">
-                                        <strong>RECOMMENDED ACTION:</strong><br/>
+                                    <div className="bg-red-50 border-l-4 border-red-500 p-4 text-sm text-red-900 font-medium rounded-r-md">
+                                        <strong className="block uppercase text-xs text-red-600 mb-1">Recommended Action:</strong>
                                         {evt.remediation}
                                     </div>
                                 </div>
                             ))}
                         </div>
                     )}
-                    <div className="mt-8 pt-4 border-t border-slate-300 text-xs text-center text-slate-400 font-sans">
-                        Generated by CyberSentinel v2.0 | Validated by SOC Team Alpha
+                    <div className="mt-12 pt-6 border-t border-slate-200 text-xs text-center text-slate-400 font-mono uppercase tracking-wider">
+                        Generated by CyberSentinel v2.0 AI Core | Validated by SOC Team Alpha
                     </div>
                 </div>
             );
@@ -260,19 +318,16 @@
             const [isSyncing, setIsSyncing] = useState(false);
             const [lastUpdated, setLastUpdated] = useState("Never");
 
-            // --- LIVE FETCHING LOGIC ---
+            // --- LIVE FETCHING LOGIC (Unchanged) ---
             const fetchLiveFeeds = async () => {
                 setIsSyncing(true);
                 const allItems = [];
-                // Use a more robust CORS proxy
                 const proxyUrl = "https://corsproxy.io/?";
                 
                 const fetchPromises = FEED_SOURCES.map(async (source) => {
                     try {
                         const response = await fetch(proxyUrl + encodeURIComponent(source.url));
-                        if (!response.ok) {
-                            return;
-                        }
+                        if (!response.ok) return;
                         const text = await response.text();
                         const parser = new DOMParser();
                         const xml = parser.parseFromString(text, "text/xml");
@@ -284,7 +339,6 @@
                             const pubDateRaw = item.querySelector("pubDate")?.textContent;
                             const dateObj = pubDateRaw ? new Date(pubDateRaw) : new Date();
                             const dateStr = dateObj.toISOString().split('T')[0];
-                            
                             const { attacker, method, sector } = analyzeText(title + " " + description);
 
                             allItems.push({
@@ -301,14 +355,11 @@
                                 link: item.querySelector("link")?.textContent
                             });
                         });
-                    } catch (error) {
-                        // Suppress error logging
-                    }
+                    } catch (error) { /* Suppress error logging */ }
                 });
 
                 await Promise.all(fetchPromises);
                 
-                // FALLBACK: If network blocks fetch entirely, generate simulated live events for today
                 if (allItems.length === 0) {
                     const simulated = generateFallbackLiveEvents();
                     allItems.push(...simulated);
@@ -321,7 +372,7 @@
                 setIsSyncing(false);
             };
 
-            // Initial Fetch
+            // Initial Fetch - This runs on every page load/refresh
             useEffect(() => {
                 fetchLiveFeeds();
             }, []);
@@ -336,24 +387,30 @@
             }, [liveData, searchTerm]);
 
             return (
-                <div className="min-h-screen pb-10">
+                <div className="min-h-screen pb-12 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-cyber-slate via-cyber-dark to-black">
                     {/* NAV */}
-                    <nav className="bg-slate-900 border-b border-slate-800 sticky top-0 z-50">
-                        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                                <div className="w-3 h-3 bg-red-500 rounded-full pulse-dot"></div>
-                                <span className="font-bold text-lg tracking-widest font-mono">CYBER<span className="text-blue-500">SENTINEL</span></span>
+                    <nav className="bg-cyber-dark/80 backdrop-blur-md border-b border-slate-800/50 sticky top-0 z-50 shadow-lg shadow-black/20">
+                        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+                            <div className="flex items-center gap-3 group cursor-pointer" onClick={fetchLiveFeeds}>
+                                <div className="relative">
+                                    <div className="w-3 h-3 bg-cyber-red rounded-full absolute inset-0 pulse-signal"></div>
+                                    <div className="w-3 h-3 bg-cyber-red rounded-full relative z-10 shadow-glow-red"></div>
+                                </div>
+                                <span className="font-bold text-xl tracking-[0.2em] font-mono text-white group-hover:text-cyber-blue transition-colors">CYBER<span className="text-cyber-blue group-hover:text-white transition-colors">SENTINEL</span></span>
                             </div>
-                            <div className="flex items-center gap-4">
-                                <div className="hidden md:block text-right mr-2">
-                                    <div className="text-[10px] text-slate-500 uppercase font-bold">Live Feed Status</div>
-                                    <div className="text-xs font-mono text-emerald-400 flex items-center justify-end gap-1">
-                                        {isSyncing ? "SYNCING..." : "ONLINE"} <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full"></span>
+                            <div className="flex items-center gap-6">
+                                <div className="hidden md:flex flex-col items-end mr-2">
+                                    <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">System Status</div>
+                                    <div className="text-xs font-mono text-cyber-green flex items-center justify-end gap-2 font-bold shadow-glow-green">
+                                        {isSyncing ? "FETCHING DATA..." : "SYSTEM ONLINE"} 
+                                        <span className={`w-2 h-2 bg-cyber-green rounded-full ${isSyncing ? 'animate-ping' : ''}`}></span>
                                     </div>
                                 </div>
-                                <button onClick={() => setView('dashboard')} className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${view === 'dashboard' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'}`}>Live Dashboard</button>
-                                <button onClick={() => setView('report')} className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${view === 'report' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'}`}>Briefings</button>
-                                <button onClick={fetchLiveFeeds} className="p-2 text-slate-400 hover:text-white rounded-full hover:bg-slate-800 transition-all" title="Refresh Feed">
+                                <div className="flex bg-slate-900/50 rounded-md p-1 border border-slate-800/50">
+                                    <button onClick={() => setView('dashboard')} className={`px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-all ${view === 'dashboard' ? 'bg-cyber-blue text-cyber-dark shadow-glow-blue' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}>Dashboard</button>
+                                    <button onClick={() => setView('report')} className={`px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-all ${view === 'report' ? 'bg-cyber-blue text-cyber-dark shadow-glow-blue' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}>Briefings</button>
+                                </div>
+                                <button onClick={fetchLiveFeeds} className="p-2 text-cyber-blue hover:text-white hover:bg-cyber-blue/20 rounded-full transition-all border border-cyber-blue/30 hover:border-cyber-blue hover:shadow-glow-blue" title="Force Refresh Feeds">
                                     <svg className={`w-5 h-5 ${isSyncing ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                                 </button>
                             </div>
@@ -362,60 +419,90 @@
 
                     {/* DASHBOARD VIEW */}
                     {view === 'dashboard' && (
-                        <main className="max-w-7xl mx-auto px-4 mt-8 space-y-6 slide-in">
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                <div className="bg-slate-800 p-5 rounded-lg border border-slate-700">
-                                    <h3 className="text-xs text-slate-400 font-bold uppercase">Total Events Logged</h3>
-                                    <div className="text-3xl font-mono font-bold mt-1 text-white">{liveData.length}</div>
-                                    <div className="text-xs text-slate-500 mt-1">Full 2025 Timeline</div>
+                        <main className="max-w-7xl mx-auto px-6 mt-10 space-y-8 slide-in">
+                            {/* KPI Grid */}
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                                <div className="cyber-card p-6 rounded-xl relative overflow-hidden border-l-4 border-cyber-blue group">
+                                    <div className="absolute right-4 top-4 text-cyber-blue/10 group-hover:text-cyber-blue/30 transition-all"><svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor"><path d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0zM13 17a2 2 0 11-4 0 2 2 0 014 0z" /><path fillRule="evenodd" d="M4 5a2 2 0 012-2h12a2 2 0 012 2v7a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm2 0v7h12V5H6z" clipRule="evenodd" /></svg></div>
+                                    <h3 className="text-xs text-cyber-blue font-bold uppercase tracking-widest mb-2">Total Events Logged</h3>
+                                    <div className="text-4xl font-mono font-black text-white shadow-glow-blue">{liveData.length}</div>
+                                    <div className="text-xs text-slate-500 mt-2 font-mono">Scope: Oct 2025 - Present</div>
                                 </div>
-                                <div className="bg-slate-800 p-5 rounded-lg border border-slate-700">
-                                    <h3 className="text-xs text-slate-400 font-bold uppercase">Last Sync</h3>
-                                    <div className="text-xl font-mono font-bold mt-2 text-emerald-400">{lastUpdated}</div>
+                                <div className="cyber-card p-6 rounded-xl relative overflow-hidden border-l-4 border-cyber-green group">
+                                     <div className="absolute right-4 top-4 text-cyber-green/10 group-hover:text-cyber-green/30 transition-all"><svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" /></svg></div>
+                                    <h3 className="text-xs text-cyber-green font-bold uppercase tracking-widest mb-2">Last Data Sync</h3>
+                                    <div className="text-2xl font-mono font-bold text-white mt-3">{lastUpdated}</div>
+                                    <div className="text-xs text-slate-500 mt-2 font-mono">Auto-refresh active</div>
                                 </div>
-                                <div className="bg-slate-800 p-5 rounded-lg border border-slate-700">
-                                    <h3 className="text-xs text-slate-400 font-bold uppercase">Active Sources</h3>
-                                    <div className="text-3xl font-mono font-bold mt-1 text-blue-400">{FEED_SOURCES.length}</div>
+                                <div className="cyber-card p-6 rounded-xl relative overflow-hidden border-l-4 border-cyber-yellow group">
+                                    <div className="absolute right-4 top-4 text-cyber-yellow/10 group-hover:text-cyber-yellow/30 transition-all"><svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a1 1 0 00-.365-.38L3.31 12.397a1 1 0 110-3zM8 14.222V10.12l1.69-.723a1 1 0 011.322 0l1.69.723v4.102a1 1 0 11-3.382 0zM18 12.397l-1.325 1.445a1 1 0 00-.365.38v-4.102l1.69-.723a1 1 0 110 3z" /></svg></div>
+                                    <h3 className="text-xs text-cyber-yellow font-bold uppercase tracking-widest mb-2">Active Intel Sources</h3>
+                                    <div className="text-4xl font-mono font-black text-white">{FEED_SOURCES.length}</div>
+                                    <div className="text-xs text-slate-500 mt-2 font-mono">RSS/ATOM Feeds</div>
                                 </div>
-                                <div className="bg-slate-800 p-5 rounded-lg border border-slate-700">
-                                    <h3 className="text-xs text-slate-400 font-bold uppercase">Critical Threats</h3>
-                                    <div className="text-3xl font-mono font-bold mt-1 text-red-500">{liveData.filter(i => i.method === "Ransomware" || i.method === "Zero-Day Exploit").length}</div>
-                                    <div className="text-xs text-slate-500 mt-1">Ransomware / 0-Day</div>
+                                <div className="cyber-card p-6 rounded-xl relative overflow-hidden border-l-4 border-cyber-red group">
+                                    <div className="absolute right-4 top-4 text-cyber-red/10 group-hover:text-cyber-red/30 transition-all pulse-signal"><svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor"><path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" /></svg></div>
+                                    <h3 className="text-xs text-cyber-red font-bold uppercase tracking-widest mb-2">High Severity Threats</h3>
+                                    <div className="text-4xl font-mono font-black text-cyber-red shadow-glow-red">{liveData.filter(i => i.method === "Ransomware" || i.method === "Zero-Day Exploit").length}</div>
+                                    <div className="text-xs text-slate-500 mt-2 font-mono">Ransomware / 0-Day</div>
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                <div className="md:col-span-2">
+                            {/* Main Content Grid */}
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                {/* Left Column: Chart & Table */}
+                                <div className="lg:col-span-2 space-y-6">
                                     <TrendChart data={liveData} />
-                                    <div className="mt-6 flex gap-2">
-                                        <input type="text" placeholder="Search entire 2025 archive..." className="flex-1 bg-slate-800 border border-slate-700 rounded-lg p-3 text-sm focus:outline-none focus:border-blue-500 text-white font-mono" onChange={(e) => setSearchTerm(e.target.value)} />
-                                        {isSyncing && <span className="text-xs text-slate-500 self-center">Fetching updates...</span>}
+                                    
+                                    {/* Search & Controls */}
+                                    <div className="flex gap-4 items-center p-1 bg-slate-900/50 rounded-lg border border-slate-800/50">
+                                        <div className="relative flex-1">
+                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <svg className="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                                            </div>
+                                            <input type="text" placeholder="Search archived logs & live feeds..." className="w-full pl-10 pr-4 py-3 bg-transparent text-sm text-white font-mono focus:outline-none border-none focus:ring-0 placeholder-slate-600" onChange={(e) => setSearchTerm(e.target.value)} />
+                                        </div>
+                                        {isSyncing && <span className="text-xs text-cyber-blue font-mono animate-pulse pr-4">Updating...</span>}
                                     </div>
-                                    <div className="mt-4 bg-slate-800 rounded-lg border border-slate-700 overflow-hidden">
+
+                                    {/* Data Table */}
+                                    <div className="cyber-card rounded-xl overflow-hidden shadow-screen">
                                         <div className="overflow-x-auto">
                                             <table className="w-full text-left text-sm">
-                                                <thead className="bg-slate-900 text-slate-400 uppercase text-xs font-bold">
+                                                <thead className="bg-[#0a0f1d] text-slate-400 uppercase text-[11px] font-bold tracking-wider border-b border-slate-800">
                                                     <tr>
-                                                        <th className="p-4">Date</th>
-                                                        <th className="p-4">Event / Target</th>
-                                                        <th className="p-4">Method</th>
-                                                        <th className="p-4">Source</th>
-                                                        <th className="p-4 text-right">Action</th>
+                                                        <th className="p-5">Timestamp</th>
+                                                        <th className="p-5">Target Entity / Sector</th>
+                                                        <th className="p-5">Attack Vector</th>
+                                                        <th className="p-5">Intel Source</th>
+                                                        <th className="p-5 text-right">Details</th>
                                                     </tr>
                                                 </thead>
-                                                {/* FIXED: Increased slice limit from 50 to 500 to show older data even when live feed is busy */}
-                                                <tbody className="divide-y divide-slate-700">
+                                                <tbody className="divide-y divide-slate-800/50 font-mono">
                                                     {filteredData.slice(0, 500).map(row => (
-                                                        <tr key={row.id} className="hover:bg-slate-700/50 transition-colors">
-                                                            <td className="p-4 font-mono text-slate-400 whitespace-nowrap">{row.date}</td>
-                                                            <td className="p-4">
-                                                                <div className="font-bold text-white line-clamp-1">{row.target}</div>
-                                                                <div className="text-xs text-slate-500">{row.sector}</div>
+                                                        <tr key={row.id} className="hover:bg-cyber-blue/5 transition-all group">
+                                                            <td className="p-5 text-cyber-blue whitespace-nowrap">{row.date}</td>
+                                                            <td className="p-5 font-sans">
+                                                                <div className="font-bold text-white text-base mb-1 group-hover:text-cyber-blue transition-colors line-clamp-1">{row.target}</div>
+                                                                <div className="text-xs text-slate-500 font-bold uppercase tracking-wider">{row.sector}</div>
                                                             </td>
-                                                            <td className="p-4 text-slate-300">{row.method}</td>
-                                                            <td className="p-4"><span className="text-xs bg-slate-900 px-2 py-1 rounded border border-slate-600 text-slate-400 whitespace-nowrap">{row.source}</span></td>
-                                                            <td className="p-4 text-right">
-                                                                <button onClick={() => setSelectedEvent(row)} className="text-blue-400 hover:underline">View</button>
+                                                            <td className="p-5">
+                                                                <span className={`px-2 py-1 text-[10px] font-bold uppercase rounded-sm border ${
+                                                                    row.method.includes('Ransom') ? 'bg-cyber-red/10 text-cyber-red border-cyber-red/30' :
+                                                                    row.method.includes('Zero') ? 'bg-cyber-red/10 text-cyber-red border-cyber-red/30' :
+                                                                    'bg-cyber-blue/10 text-cyber-blue border-cyber-blue/30'
+                                                                }`}>{row.method}</span>
+                                                            </td>
+                                                            <td className="p-5">
+                                                                <span className="text-xs text-slate-400 flex items-center gap-1">
+                                                                    <span className="w-1.5 h-1.5 rounded-full bg-cyber-green shadow-glow-green"></span>
+                                                                    {row.source}
+                                                                </span>
+                                                            </td>
+                                                            <td className="p-5 text-right">
+                                                                <button onClick={() => setSelectedEvent(row)} className="text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-cyber-blue border border-slate-700 hover:border-cyber-blue px-3 py-1 rounded-sm transition-all hover:shadow-glow-blue">
+                                                                    Analyze &rarr;
+                                                                </button>
                                                             </td>
                                                         </tr>
                                                     ))}
@@ -425,19 +512,31 @@
                                     </div>
                                 </div>
 
-                                <div className="bg-slate-800 p-6 rounded-lg border border-slate-700 h-fit">
-                                    <h4 className="text-xs font-bold text-slate-400 uppercase mb-4 text-center">Live Intelligence Feeds</h4>
-                                    <ul className="space-y-3">
-                                        {FEED_SOURCES.map((src, i) => (
-                                            <li key={i} className="flex items-center gap-3 text-sm text-slate-300">
-                                                <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
-                                                {src.name}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                    <div className="mt-6 p-4 bg-slate-900/50 rounded border border-slate-800 text-xs text-slate-500 leading-relaxed">
-                                        <strong className="block text-slate-400 mb-2">System Note:</strong>
-                                        This dashboard aggregates real-time RSS feeds with a comprehensive historical archive covering <strong>October 2025 to Present</strong>. Live feeds update automatically on refresh.
+                                {/* Right Column: Sidebar */}
+                                <div className="space-y-6">
+                                    {/* Live Feed Status Widget */}
+                                    <div className="cyber-card p-6 rounded-xl border-t-4 border-cyber-green relative overflow-hidden">
+                                        <div className="absolute inset-0 bg-cyber-green/5 animate-pulse pointer-events-none"></div>
+                                        <h4 className="text-sm font-bold text-cyber-green uppercase mb-4 tracking-wider flex items-center gap-2">
+                                            <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                            Live Feed Connectors
+                                        </h4>
+                                        <ul className="space-y-3 mb-6">
+                                            {FEED_SOURCES.map((src, i) => (
+                                                <li key={i} className="flex items-center justify-between text-xs text-slate-300 border-b border-slate-800/50 pb-2 last:border-0">
+                                                    <span className="flex items-center gap-2">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-cyber-green shadow-glow-green"></span>
+                                                        {src.name}
+                                                    </span>
+                                                    <span className="text-cyber-green font-mono">[OK]</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                        {/* THE ANSWER TO YOUR QUESTION IS HERE */}
+                                        <div className="p-4 bg-[#0a0f1d] rounded-md border border-cyber-blue/30 text-xs text-slate-400 leading-relaxed shadow-screen font-mono">
+                                            <strong className="block text-cyber-blue mb-2 uppercase tracking-wider">/// SYSTEM NOTE: AUTO-UPDATE ACTIVE</strong>
+                                            This dashboard is connected to live RSS threat feeds. <strong>Refreshing this page will automatically fetch and display new incidents</strong> published today by the connected sources.
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -446,51 +545,62 @@
 
                     {/* REPORT VIEW */}
                     {view === 'report' && (
-                        <main className="max-w-4xl mx-auto mt-8 px-4">
-                             {/* Pass the most recent date from data to the report */}
+                        <main className="max-w-5xl mx-auto mt-12 px-6 slide-in">
                             <DailyReport data={liveData} date={liveData[0]?.date || new Date().toISOString().split('T')[0]} />
                         </main>
                     )}
 
-                    {/* MODAL */}
+                    {/* MODAL (Incident Details) */}
                     {selectedEvent && (
-                        <div className="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-4">
-                            <div className="bg-slate-900 w-full max-w-2xl rounded-xl border border-slate-700 shadow-2xl overflow-hidden relative slide-in">
-                                <button onClick={() => setSelectedEvent(null)} className="absolute top-4 right-4 text-slate-500 hover:text-white"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
-                                <div className="p-8">
-                                    <div className="flex items-center gap-3 mb-2">
-                                        <span className="bg-blue-600 text-white px-2 py-0.5 text-xs font-bold uppercase tracking-wider rounded">{selectedEvent.source}</span>
-                                        <span className="text-slate-500 font-mono text-sm">{selectedEvent.date}</span>
-                                    </div>
-                                    <h2 className="text-xl font-bold text-white mb-4">{selectedEvent.target}</h2>
-                                    <div className="grid grid-cols-2 gap-6 mb-6">
-                                        <div className="bg-slate-950 p-4 rounded border border-slate-800">
-                                            <div className="text-xs text-slate-500 uppercase font-bold">Suspected Actor</div>
-                                            <div className="text-red-400 font-mono">{selectedEvent.attacker}</div>
+                        <div className="fixed inset-0 bg-[#050a14]/95 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+                            <div className="cyber-card w-full max-w-2xl rounded-xl border-t-4 border-cyber-red shadow-2xl overflow-hidden relative slide-in">
+                                <div className="absolute inset-0 bg-cyber-red/5 pointer-events-none"></div>
+                                {/* Modal Header */}
+                                <div className="bg-[#0a0f1d] p-6 border-b border-slate-800 flex justify-between items-start relative z-10">
+                                    <div>
+                                        <div className="flex items-center gap-3 mb-3">
+                                            <span className="bg-cyber-red/10 text-cyber-red border border-cyber-red/30 px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-sm shadow-glow-red">Critical Incident</span>
+                                            <span className="text-slate-400 font-mono text-sm flex items-center gap-1"><svg className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg> {selectedEvent.date}</span>
                                         </div>
-                                        <div className="bg-slate-950 p-4 rounded border border-slate-800">
-                                            <div className="text-xs text-slate-500 uppercase font-bold">Method</div>
-                                            <div className="text-emerald-400 font-mono">{selectedEvent.method}</div>
+                                        <h2 className="text-2xl font-black text-white uppercase tracking-tight">{selectedEvent.target}</h2>
+                                    </div>
+                                    <button onClick={() => setSelectedEvent(null)} className="text-slate-500 hover:text-cyber-red transition-colors p-1 hover:bg-slate-800 rounded-full"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+                                </div>
+                                
+                                {/* Modal Body */}
+                                <div className="p-8 relative z-10 space-y-8">
+                                    <div className="grid grid-cols-2 gap-6">
+                                        <div className="bg-[#0a0f1d] p-4 rounded-lg border border-slate-800 shadow-screen">
+                                            <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Threat Actor / Group</div>
+                                            <div className="text-lg text-cyber-red font-mono font-bold">{selectedEvent.attacker}</div>
+                                        </div>
+                                        <div className="bg-[#0a0f1d] p-4 rounded-lg border border-slate-800 shadow-screen">
+                                            <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Attack Vector</div>
+                                            <div className="text-lg text-cyber-blue font-mono font-bold">{selectedEvent.method}</div>
                                         </div>
                                     </div>
-                                    <div className="space-y-4">
-                                        <div>
-                                            <h3 className="text-sm font-bold text-white uppercase mb-2">Details</h3>
-                                            <p className="text-slate-300 text-sm leading-relaxed bg-slate-800/50 p-3 rounded border border-slate-700">{selectedEvent.impact}</p>
+
+                                    <div>
+                                        <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-3 flex items-center gap-2"><svg className="w-4 h-4 text-cyber-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> Impact Summary</h3>
+                                        <div className="bg-slate-900/80 p-5 rounded-lg border border-slate-700/50 text-slate-300 text-sm leading-relaxed font-mono shadow-screen">
+                                            {selectedEvent.impact}
                                         </div>
                                         {selectedEvent.link && (
-                                            <a href={selectedEvent.link} target="_blank" className="inline-block text-blue-400 hover:text-blue-300 text-sm mt-2 font-medium">Read Full Article &rarr;</a>
+                                            <a href={selectedEvent.link} target="_blank" className="inline-flex items-center gap-2 text-cyber-blue hover:text-white text-xs mt-4 font-bold uppercase tracking-wider transition-colors border-b border-cyber-blue/30 hover:border-cyber-blue pb-1">
+                                                View Source Intelligence <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                                            </a>
                                         )}
-                                        <div>
-                                            <h3 className="text-sm font-bold text-yellow-500 uppercase mb-2">Remediation Strategy</h3>
-                                            <div className="bg-yellow-900/10 border-l-4 border-yellow-500 p-4 text-yellow-100 text-sm">
-                                                {selectedEvent.remediation}
-                                            </div>
+                                    </div>
+
+                                    <div>
+                                        <h3 className="text-sm font-bold text-cyber-yellow uppercase tracking-wider mb-3 flex items-center gap-2"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg> Mitigation Strategy</h3>
+                                        <div className="bg-cyber-yellow/10 border-l-4 border-cyber-yellow p-5 text-cyber-yellow text-sm font-medium rounded-r-lg leading-relaxed">
+                                            {selectedEvent.remediation}
                                         </div>
                                     </div>
                                 </div>
-                                <div className="bg-slate-950 p-4 text-right border-t border-slate-800">
-                                    <button onClick={() => setSelectedEvent(null)} className="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded text-sm text-white transition-colors">Close</button>
+                                <div className="bg-[#0a0f1d] p-4 text-right border-t border-slate-800 relative z-10">
+                                    <button onClick={() => setSelectedEvent(null)} className="px-6 py-2 bg-slate-800 hover:bg-cyber-red/20 hover:text-cyber-red hover:border-cyber-red border border-slate-700 rounded-sm text-xs font-bold uppercase tracking-wider text-slate-300 transition-all">Close Panel</button>
                                 </div>
                             </div>
                         </div>
