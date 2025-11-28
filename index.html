@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CyberSecurity Dashboard v2.2</title>
+    <title>CyberSecurity Dashboard v2.3</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -89,13 +89,13 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo } = React;
 
-        // --- DATA SOURCES (Updated with user requests) ---
+        // --- DATA SOURCES ---
         const FEED_SOURCES = [
             { name: 'Cisco Talos Intelligence', url: 'https://blog.talosintelligence.com/rss/' },
             { name: 'Abuse.ch URLhaus', url: 'https://abuse.ch/feed/' },
             { name: 'SANS Internet Storm Center', url: 'https://isc.sans.edu/rssfeed.xml' },
             { name: 'CISA (KEV/Alerts)', url: 'https://www.cisa.gov/uscert/ncas/current-activity.xml' },
-            { name: 'EuRepoC (Incidents)', url: 'https://www.enisa.europa.eu/news/@@rss' }, // Proxy for Euro news as EuRepoC lacks public RSS
+            { name: 'EuRepoC (Incidents)', url: 'https://www.enisa.europa.eu/news/@@rss' },
             { name: 'BleepingComputer', url: 'https://www.bleepingcomputer.com/feed/' },
             { name: 'The Hacker News', url: 'https://feeds.feedburner.com/TheHackersNews' },
             { name: 'Krebs on Security', url: 'https://krebsonsecurity.com/feed/' },
@@ -103,9 +103,7 @@
         ];
 
         // --- HISTORICAL DATA (Oct-Nov 2025) ---
-        // UPDATED: Added specific financial costs to almost all records
         const HISTORICAL_DATA = [
-            // --- NOVEMBER 2025 ---
             { id: 2001, date: "2025-11-28", target: "Global Logistics Co.", sector: "Logistics", method: "Ransomware", attacker: "LockBit 4.0", impact: "Shipping manifest system offline worldwide.", cost: "$5.2 Million", remediation: "Isolate Asia-Pacific nodes. Revert to paper manifest.", source: "Intel Report" },
             { id: 2002, date: "2025-11-27", target: "Sony Group Corp.", sector: "Technology", method: "Data Extortion", attacker: "Qilin", impact: "2TB of dev data & employee PII encrypted.", cost: "$15 Million", remediation: "Network segmentation. Forced credential rotation globally.", source: "Archive" },
             { id: 2003, date: "2025-11-26", target: "Nvidia", sector: "Tech/Chip", method: "Espionage", attacker: "Lapsus$ Returns", impact: "Source code for new driver architecture leaked.", cost: "$250M (IP Value)", remediation: "Enhanced endpoint monitoring. Legal takedowns.", source: "Archive" },
@@ -116,8 +114,6 @@
             { id: 2008, date: "2025-11-12", target: "Ascension Health", sector: "Healthcare", method: "Ransomware", attacker: "BlackCat", impact: "EHR downtime across 14 states. Patient diversion.", cost: "$45 Million", remediation: "Restore from offline immutable backups. Rebuild AD forest.", source: "Archive" },
             { id: 2009, date: "2025-11-08", target: "OpenAI API", sector: "Technology", method: "DDoS", attacker: "Anonymous Sudan", impact: "API Gateway 502 Errors for 4 hours.", cost: "$800k Credits", remediation: "Scale ingress controllers. Rate limiting adjustment.", source: "Archive" },
             { id: 2010, date: "2025-11-02", target: "BMW Group", sector: "Automotive", method: "Ind. Espionage", attacker: "APT29", impact: "EV Battery research data accessed.", cost: "Strategic Loss", remediation: "Internal network audit. MFA enforcement.", source: "Archive" },
-
-            // --- OCTOBER 2025 ---
             { id: 2011, date: "2025-10-31", target: "Lockheed Martin", sector: "Defense", method: "Phishing", attacker: "Nobelium", impact: "Unauthorized access to unclassified email server.", cost: "Undisclosed", remediation: "Forensic image of Exchange servers. Reset federated trusts.", source: "Archive" },
             { id: 2012, date: "2025-10-28", target: "Costco Wholesale", sector: "Retail", method: "POS Malware", attacker: "Fin7", impact: "Credit card scraping in 40 west coast locations.", cost: "$8 Million", remediation: "Re-image POS terminals. End-to-end encryption audit.", source: "Archive" },
             { id: 2013, date: "2025-10-25", target: "Toyota Motor Corp.", sector: "Automotive", method: "API Leak", attacker: "Unknown", impact: "T-Connect app data exposed 2M customer locations.", cost: "GDPR Fine (Est.)", remediation: "Implement strict API schema validation. Rotate keys.", source: "Archive" },
@@ -127,24 +123,21 @@
             { id: 2017, date: "2025-10-10", target: "23andMe", sector: "BioTech", method: "Credential Stuffing", attacker: "GnosticPlayers", impact: "Genomic data scraping of 4M accounts.", cost: "$30M Settlement", remediation: "Force MFA reset for all users. Deprecate legacy API.", source: "Archive" },
             { id: 2018, date: "2025-10-05", target: "Verizon", sector: "Telecom", method: "Insider Threat", attacker: "Employee", impact: "SIM Swapping capability sold on dark web.", cost: "Legal Fees", remediation: "Restrict access to subscriber SIM tools.", source: "Archive" },
             { id: 2019, date: "2025-10-02", target: "Salesforce", sector: "Tech", method: "Misconfiguration", attacker: "N/A", impact: "Internal 'Ghost' permission allowed data view.", cost: "Trust Loss", remediation: "Rollback permission sets. Automated config audit.", source: "Archive" },
-            
-            // --- SEPTEMBER 2025 (Context) ---
             { id: 301, date: "2025-09-28", target: "MGM Resorts", sector: "Hospitality", method: "Social Engineering", attacker: "Scattered Spider", impact: "Slot machines offline, room keys inoperable for 5 days.", cost: "$100 Million", remediation: "Rebuild Identity Management (IdM) stack.", source: "Archive" },
         ];
 
-        // --- UTILITY: Heuristics ---
+        // --- UTILITY: Heuristics & Analysis ---
         const analyzeText = (text) => {
             const lower = text.toLowerCase();
             let attacker = "Unknown Group";
             let method = "Cyber Incident";
             let sector = "General";
             let detectedCost = "Undisclosed";
+            let remediation = "Conduct root cause analysis. Review vendor bulletins for IOCs.";
 
             // --- SMART COST DETECTION ---
-            // Regex to look for patterns like "$50 million", "$10m", "100 million dollars"
             const moneyRegex = /\$(\d+(?:\.\d+)?)\s*(million|billion|m|b|k)|(\d+(?:\.\d+)?)\s*(million|billion)\s*dollars/i;
             const moneyMatch = text.match(moneyRegex);
-            
             if (moneyMatch) {
                 detectedCost = moneyMatch[0].toUpperCase();
             } else if (lower.includes('ransom paid')) {
@@ -153,7 +146,7 @@
                 detectedCost = "Regulatory Fines";
             }
 
-            // Guess Attacker
+            // --- ATTACKER DETECTION ---
             if (lower.includes('cl0p') || lower.includes('clop')) attacker = "Cl0p";
             else if (lower.includes('lockbit')) attacker = "LockBit";
             else if (lower.includes('blackcat') || lower.includes('alphv')) attacker = "ALPHV/BlackCat";
@@ -170,17 +163,38 @@
             else if (lower.includes('bianlian')) attacker = "BianLian";
             else if (lower.includes('ta577')) attacker = "TA577";
             else if (lower.includes('fin7')) attacker = "Fin7";
-            else if (lower.includes('conti')) attacker = "Conti";
 
-            // Guess Method
-            if (lower.includes('ransomware')) method = "Ransomware";
-            else if (lower.includes('phish')) method = "Phishing";
-            else if (lower.includes('ddos')) method = "DDoS Attack";
-            else if (lower.includes('vulnerability') || lower.includes('exploit') || lower.includes('zero-day') || lower.includes('cve') || lower.includes('kev')) method = "Vuln Exploitation";
-            else if (lower.includes('leak') || lower.includes('breach') || lower.includes('stolen')) method = "Data Breach";
-            else if (lower.includes('malware') || lower.includes('backdoor') || lower.includes('botnet')) method = "Malware";
+            // --- METHOD DETECTION & DYNAMIC REMEDIATION ---
+            if (lower.includes('ransomware')) {
+                method = "Ransomware";
+                remediation = "Isolate infected systems immediately. Do NOT pay ransom. Restore from offline backups and rotate admin credentials.";
+            }
+            else if (lower.includes('phish') || lower.includes('social engineering')) {
+                method = "Phishing";
+                remediation = "Reset compromised user passwords. Revoke active sessions. Scan for email forwarding rules and implement FIDO2 MFA.";
+            }
+            else if (lower.includes('ddos')) {
+                method = "DDoS Attack";
+                remediation = "Activate upstream DDoS protection. Implement rate limiting on API endpoints and geo-blocking if applicable.";
+            }
+            else if (lower.includes('vulnerability') || lower.includes('exploit') || lower.includes('zero-day') || lower.includes('cve') || lower.includes('kev')) {
+                method = "Vuln Exploitation";
+                remediation = "Apply vendor patches immediately. If patches are unavailable, implement WAF rules or network segmentation.";
+            }
+            else if (lower.includes('leak') || lower.includes('breach') || lower.includes('stolen') || lower.includes('exfiltration')) {
+                method = "Data Breach";
+                remediation = "Identify scope of data loss. Reset all user passwords. Notify legal team and affected data subjects.";
+            }
+            else if (lower.includes('malware') || lower.includes('backdoor') || lower.includes('botnet') || lower.includes('trojan')) {
+                method = "Malware";
+                remediation = "Re-image infected machines. Update EDR signatures. Block command & control (C2) domains at the firewall.";
+            }
+            else if (lower.includes('insider') || lower.includes('employee')) {
+                method = "Insider Threat";
+                remediation = "Revoke user access immediately. Preserve logs for legal evidence. Conduct user behavior analytics (UBA) review.";
+            }
 
-            // Guess Sector
+            // --- SECTOR DETECTION ---
             if (lower.includes('hospital') || lower.includes('health') || lower.includes('patient') || lower.includes('clinic')) sector = "Healthcare";
             else if (lower.includes('bank') || lower.includes('financial') || lower.includes('crypto')) sector = "Finance";
             else if (lower.includes('government') || lower.includes('ministry') || lower.includes('state') || lower.includes('federal')) sector = "Government";
@@ -191,15 +205,15 @@
             else if (lower.includes('retail') || lower.includes('shop') || lower.includes('store')) sector = "Retail";
             else if (lower.includes('hotel') || lower.includes('resort')) sector = "Hospitality";
 
-            return { attacker, method, sector, detectedCost };
+            return { attacker, method, sector, detectedCost, remediation };
         };
 
         const generateFallbackLiveEvents = () => {
             const today = new Date().toISOString().split('T')[0];
             return [
-                { id: 'simulated-1', date: today, target: "Global FinTech Clearinghouse", sector: "Finance", method: "DDoS", attacker: "Killnet", impact: "Transaction latency spikes detected globally.", cost: "Undisclosed", remediation: "Traffic scrubbing and geo-blocking initiated.", source: "Live Monitor (Simulated)" },
-                { id: 'simulated-2', date: today, target: "Regional Utility Provider", sector: "Energy", method: "Ransomware", attacker: "LockBit 3.0", impact: "Administrative networks encrypted. Grid ops normal.", cost: "$2M Demand", remediation: "Isolating infected VLANs. Restoring from backups.", source: "Live Monitor (Simulated)" },
-                { id: 'simulated-3', date: today, target: "Cloud Storage Alpha", sector: "Technology", method: "Zero-Day", attacker: "Unknown", impact: "Potential unauth access to S3 buckets.", cost: "Investigation", remediation: "Emergency patching of ingress controllers.", source: "Live Monitor (Simulated)" }
+                { id: 'simulated-1', date: today, target: "Global FinTech Clearinghouse", sector: "Finance", method: "DDoS", attacker: "Killnet", impact: "Transaction latency spikes detected globally.", cost: "Undisclosed", remediation: "Activate upstream DDoS protection. Implement rate limiting on API endpoints.", source: "Live Monitor (Simulated)" },
+                { id: 'simulated-2', date: today, target: "Regional Utility Provider", sector: "Energy", method: "Ransomware", attacker: "LockBit 3.0", impact: "Administrative networks encrypted. Grid ops normal.", cost: "$2M Demand", remediation: "Isolate infected systems immediately. Do NOT pay ransom. Restore from offline backups.", source: "Live Monitor (Simulated)" },
+                { id: 'simulated-3', date: today, target: "Cloud Storage Alpha", sector: "Technology", method: "Zero-Day", attacker: "Unknown", impact: "Potential unauth access to S3 buckets.", cost: "Investigation", remediation: "Apply vendor patches immediately. Implement WAF rules.", source: "Live Monitor (Simulated)" }
             ];
         };
 
@@ -373,7 +387,7 @@
                             const pubDateRaw = item.querySelector("pubDate")?.textContent;
                             const dateObj = pubDateRaw ? new Date(pubDateRaw) : new Date();
                             const dateStr = dateObj.toISOString().split('T')[0];
-                            const { attacker, method, sector, detectedCost } = analyzeText(title + " " + description);
+                            const { attacker, method, sector, detectedCost, remediation } = analyzeText(title + " " + description);
 
                             allItems.push({
                                 id: `live-${source.name}-${index}`,
@@ -383,8 +397,8 @@
                                 method: method,
                                 attacker: attacker,
                                 impact: description.replace(/<[^>]*>?/gm, '').substring(0, 150) + "...",
-                                cost: detectedCost, // Auto-detected cost from text
-                                remediation: "Review full source report for IOCs and patching instructions.",
+                                cost: detectedCost, // Auto-detected
+                                remediation: remediation, // Dynamic Remediation
                                 source: source.name,
                                 link: item.querySelector("link")?.textContent
                             });
