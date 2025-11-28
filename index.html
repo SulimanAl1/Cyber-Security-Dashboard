@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CyberSecurity Dashboard v2.0</title>
+    <title>CyberSecurity Dashboard v2.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -78,16 +78,6 @@
             border-color: #374151;
             box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
         }
-
-        .cyber-input {
-            background: #0a0f1d;
-            border: 1px solid #1f2937;
-            transition: all 0.3s;
-        }
-        .cyber-input:focus {
-            border-color: #00f0ff;
-            box-shadow: 0 0 15px -5px rgba(0, 240, 255, 0.5);
-        }
         
         /* Chart Styles */
         .chart-glow { filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.6)); }
@@ -99,7 +89,7 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo } = React;
 
-        // --- DATA SOURCES (Unchanged) ---
+        // --- DATA SOURCES ---
         const FEED_SOURCES = [
             { name: 'CISA Alerts', url: 'https://www.cisa.gov/uscert/ncas/alerts.xml' },
             { name: 'BleepingComputer', url: 'https://www.bleepingcomputer.com/feed/' },
@@ -110,36 +100,36 @@
             { name: 'SecurityWeek', url: 'https://feeds.feedburner.com/Securityweek' }
         ];
 
-        // --- HISTORICAL DATA (Unchanged Oct-Nov 2025) ---
+        // --- HISTORICAL DATA (Oct-Nov 2025) ---
         const HISTORICAL_DATA = [
             // --- NOVEMBER 2025 ---
-            { id: 2001, date: "2025-11-28", target: "Global Logistics Co.", sector: "Logistics", method: "Ransomware", attacker: "LockBit 4.0", impact: "Shipping manifest system offline worldwide.", cost: "Est. $5M", remediation: "Isolate Asia-Pacific nodes. Revert to paper manifest.", source: "Intel Report" },
-            { id: 2002, date: "2025-11-27", target: "Sony Group Corp.", sector: "Technology", method: "Data Extortion", attacker: "Qilin", impact: "2TB of dev data & employee PII encrypted.", cost: "Est. $15M", remediation: "Network segmentation. Forced credential rotation globally.", source: "Archive" },
+            { id: 2001, date: "2025-11-28", target: "Global Logistics Co.", sector: "Logistics", method: "Ransomware", attacker: "LockBit 4.0", impact: "Shipping manifest system offline worldwide.", cost: "$5,000,000", remediation: "Isolate Asia-Pacific nodes. Revert to paper manifest.", source: "Intel Report" },
+            { id: 2002, date: "2025-11-27", target: "Sony Group Corp.", sector: "Technology", method: "Data Extortion", attacker: "Qilin", impact: "2TB of dev data & employee PII encrypted.", cost: "$15,000,000", remediation: "Network segmentation. Forced credential rotation globally.", source: "Archive" },
             { id: 2003, date: "2025-11-26", target: "Nvidia", sector: "Tech/Chip", method: "Espionage", attacker: "Lapsus$ Returns", impact: "Source code for new driver architecture leaked.", cost: "IP Theft", remediation: "Enhanced endpoint monitoring. Legal takedowns.", source: "Archive" },
-            { id: 2004, date: "2025-11-24", target: "DHL Supply Chain", sector: "Logistics", method: "Phishing/BEC", attacker: "TA577", impact: "Shipping redirects affecting 50k parcels.", cost: "$4.2M", remediation: "Implement hardware FIDO2 keys for logistics admins.", source: "Archive" },
+            { id: 2004, date: "2025-11-24", target: "DHL Supply Chain", sector: "Logistics", method: "Phishing/BEC", attacker: "TA577", impact: "Shipping redirects affecting 50k parcels.", cost: "$4,200,000", remediation: "Implement hardware FIDO2 keys for logistics admins.", source: "Archive" },
             { id: 2005, date: "2025-11-21", target: "JP Morgan Chase (Cloud)", sector: "Finance", method: "DDoS", attacker: "Killnet", impact: "Consumer banking app latency (5000ms).", cost: "Reputation", remediation: "Traffic scrubbing via Akamai/Cloudflare.", source: "Archive" },
-            { id: 2006, date: "2025-11-18", target: "Canon Inc.", sector: "Manufacturing", method: "Zero-Day Exploit", attacker: "Cl0p", impact: "Exfiltration of blueprints via MOVEit 3.0 flaw.", cost: "$12.5M", remediation: "Patch CVE-2025-8821. Isolate file transfer appliances.", source: "Archive" },
+            { id: 2006, date: "2025-11-18", target: "Canon Inc.", sector: "Manufacturing", method: "Zero-Day Exploit", attacker: "Cl0p", impact: "Exfiltration of blueprints via MOVEit 3.0 flaw.", cost: "$12,500,000", remediation: "Patch CVE-2025-8821. Isolate file transfer appliances.", source: "Archive" },
             { id: 2007, date: "2025-11-15", target: "National Grid (UK)", sector: "Energy", method: "ICS Probe", attacker: "Sandworm", impact: "Telemetry interruption in 4 substations.", cost: "Operational", remediation: "Air-gap critical ICS segments. Hunt for malware.", source: "Archive" },
-            { id: 2008, date: "2025-11-12", target: "Ascension Health", sector: "Healthcare", method: "Ransomware", attacker: "BlackCat", impact: "EHR downtime across 14 states. Patient diversion.", cost: "$45M", remediation: "Restore from offline immutable backups. Rebuild AD forest.", source: "Archive" },
+            { id: 2008, date: "2025-11-12", target: "Ascension Health", sector: "Healthcare", method: "Ransomware", attacker: "BlackCat", impact: "EHR downtime across 14 states. Patient diversion.", cost: "$45,000,000", remediation: "Restore from offline immutable backups. Rebuild AD forest.", source: "Archive" },
             { id: 2009, date: "2025-11-08", target: "OpenAI API", sector: "Technology", method: "DDoS", attacker: "Anonymous Sudan", impact: "API Gateway 502 Errors for 4 hours.", cost: "SLA Credits", remediation: "Scale ingress controllers. Rate limiting adjustment.", source: "Archive" },
             { id: 2010, date: "2025-11-02", target: "BMW Group", sector: "Automotive", method: "Ind. Espionage", attacker: "APT29", impact: "EV Battery research data accessed.", cost: "Strategic", remediation: "Internal network audit. MFA enforcement.", source: "Archive" },
 
             // --- OCTOBER 2025 ---
             { id: 2011, date: "2025-10-31", target: "Lockheed Martin", sector: "Defense", method: "Phishing", attacker: "Nobelium", impact: "Unauthorized access to unclassified email server.", cost: "National Sec", remediation: "Forensic image of Exchange servers. Reset federated trusts.", source: "Archive" },
-            { id: 2012, date: "2025-10-28", target: "Costco Wholesale", sector: "Retail", method: "POS Malware", attacker: "Fin7", impact: "Credit card scraping in 40 west coast locations.", cost: "$8M", remediation: "Re-image POS terminals. End-to-end encryption audit.", source: "Archive" },
-            { id: 2013, date: "2025-10-25", target: "Toyota Motor Corp.", sector: "Automotive", method: "API Leak", attacker: "Unknown", impact: "T-Connect app data exposed 2M customer locations.", cost: "Privacy", remediation: "Implement strict API schema validation. Rotate keys.", source: "Archive" },
-            { id: 2014, date: "2025-10-22", target: "Harvard University", sector: "Education", method: "Ransomware", attacker: "Royal", impact: "Research database locked. Admin systems offline.", cost: "$1M", remediation: "Refusal to pay. Restore from tape backup.", source: "Archive" },
-            { id: 2015, date: "2025-10-18", target: "City of Dallas", sector: "Government", method: "Ransomware", attacker: "Royal", impact: "Municipal courts and police dispatch limited.", cost: "$3M", remediation: "Re-image 1,200 workstations. Deploy EDR.", source: "Archive" },
-            { id: 2016, date: "2025-10-14", target: "Binance", sector: "Crypto", method: "Bridge Exploit", attacker: "Lazarus Group", impact: "Potential $100M unauthorized withdrawal halted.", cost: "Audit", remediation: "Suspend cross-chain bridge. Smart contract audit.", source: "Archive" },
+            { id: 2012, date: "2025-10-28", target: "Costco Wholesale", sector: "Retail", method: "POS Malware", attacker: "Fin7", impact: "Credit card scraping in 40 west coast locations.", cost: "$8,000,000", remediation: "Re-image POS terminals. End-to-end encryption audit.", source: "Archive" },
+            { id: 2013, date: "2025-10-25", target: "Toyota Motor Corp.", sector: "Automotive", method: "API Leak", attacker: "Unknown", impact: "T-Connect app data exposed 2M customer locations.", cost: "Privacy Fine", remediation: "Implement strict API schema validation. Rotate keys.", source: "Archive" },
+            { id: 2014, date: "2025-10-22", target: "Harvard University", sector: "Education", method: "Ransomware", attacker: "Royal", impact: "Research database locked. Admin systems offline.", cost: "$1,000,000", remediation: "Refusal to pay. Restore from tape backup.", source: "Archive" },
+            { id: 2015, date: "2025-10-18", target: "City of Dallas", sector: "Government", method: "Ransomware", attacker: "Royal", impact: "Municipal courts and police dispatch limited.", cost: "$3,000,000", remediation: "Re-image 1,200 workstations. Deploy EDR.", source: "Archive" },
+            { id: 2016, date: "2025-10-14", target: "Binance", sector: "Crypto", method: "Bridge Exploit", attacker: "Lazarus Group", impact: "Potential $100M unauthorized withdrawal halted.", cost: "Audit Costs", remediation: "Suspend cross-chain bridge. Smart contract audit.", source: "Archive" },
             { id: 2017, date: "2025-10-10", target: "23andMe", sector: "BioTech", method: "Credential Stuffing", attacker: "GnosticPlayers", impact: "Genomic data scraping of 4M accounts.", cost: "Class Action", remediation: "Force MFA reset for all users. Deprecate legacy API.", source: "Archive" },
-            { id: 2018, date: "2025-10-05", target: "Verizon", sector: "Telecom", method: "Insider Threat", attacker: "Employee", impact: "SIM Swapping capability sold on dark web.", cost: "Legal", remediation: "Restrict access to subscriber SIM tools.", source: "Archive" },
-            { id: 2019, date: "2025-10-02", target: "Salesforce", sector: "Tech", method: "Misconfiguration", attacker: "N/A", impact: "Internal 'Ghost' permission allowed data view.", cost: "Trust", remediation: "Rollback permission sets. Automated config audit.", source: "Archive" },
+            { id: 2018, date: "2025-10-05", target: "Verizon", sector: "Telecom", method: "Insider Threat", attacker: "Employee", impact: "SIM Swapping capability sold on dark web.", cost: "Legal Fees", remediation: "Restrict access to subscriber SIM tools.", source: "Archive" },
+            { id: 2019, date: "2025-10-02", target: "Salesforce", sector: "Tech", method: "Misconfiguration", attacker: "N/A", impact: "Internal 'Ghost' permission allowed data view.", cost: "Trust Loss", remediation: "Rollback permission sets. Automated config audit.", source: "Archive" },
             
             // --- SEPTEMBER 2025 (Context) ---
-            { id: 301, date: "2025-09-28", target: "MGM Resorts", sector: "Hospitality", method: "Social Engineering", attacker: "Scattered Spider", impact: "Slot machines offline, room keys inoperable for 5 days.", cost: "$100M", remediation: "Rebuild Identity Management (IdM) stack.", source: "Archive" },
+            { id: 301, date: "2025-09-28", target: "MGM Resorts", sector: "Hospitality", method: "Social Engineering", attacker: "Scattered Spider", impact: "Slot machines offline, room keys inoperable for 5 days.", cost: "$100,000,000", remediation: "Rebuild Identity Management (IdM) stack.", source: "Archive" },
         ];
 
-        // --- UTILITY: Heuristics (Unchanged) ---
+        // --- UTILITY: Heuristics ---
         const analyzeText = (text) => {
             const lower = text.toLowerCase();
             let attacker = "Unknown Group";
@@ -190,12 +180,12 @@
             const today = new Date().toISOString().split('T')[0];
             return [
                 { id: 'simulated-1', date: today, target: "Global FinTech Clearinghouse", sector: "Finance", method: "DDoS", attacker: "Killnet", impact: "Transaction latency spikes detected globally.", cost: "Undisclosed", remediation: "Traffic scrubbing and geo-blocking initiated.", source: "Live Monitor (Simulated)" },
-                { id: 'simulated-2', date: today, target: "Regional Utility Provider", sector: "Energy", method: "Ransomware", attacker: "LockBit 3.0", impact: "Administrative networks encrypted. Grid ops normal.", cost: "$2M Demand", remediation: "Isolating infected VLANs. Restoring from backups.", source: "Live Monitor (Simulated)" },
+                { id: 'simulated-2', date: today, target: "Regional Utility Provider", sector: "Energy", method: "Ransomware", attacker: "LockBit 3.0", impact: "Administrative networks encrypted. Grid ops normal.", cost: "$2,000,000 Demand", remediation: "Isolating infected VLANs. Restoring from backups.", source: "Live Monitor (Simulated)" },
                 { id: 'simulated-3', date: today, target: "Cloud Storage Alpha", sector: "Technology", method: "Zero-Day", attacker: "Unknown", impact: "Potential unauth access to S3 buckets.", cost: "Investigation", remediation: "Emergency patching of ingress controllers.", source: "Live Monitor (Simulated)" }
             ];
         };
 
-        // --- VISUAL COMPONENT UPGRADES ---
+        // --- VISUAL COMPONENTS ---
         const TrendChart = ({ data }) => {
             const trend = data.reduce((acc, curr) => {
                 if (!curr.date) return acc;
@@ -222,31 +212,22 @@
                     <div className="absolute inset-0 bg-cyber-blue/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                     <h4 className="text-sm font-bold text-cyber-blue uppercase mb-4 tracking-wider flex items-center gap-2">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>
-                        Incident Velocity (2025)
+                        Incident Velocity (Timeline)
                     </h4>
                     <svg viewBox="0 0 300 100" className="w-full h-full overflow-visible">
-                        <defs>
+                         <defs>
                             <linearGradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
                                 <stop offset="0%" stopColor="#00f0ff" stopOpacity="0.4" />
                                 <stop offset="100%" stopColor="#00f0ff" stopOpacity="0" />
                             </linearGradient>
-                             <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-                                <feGaussianBlur stdDeviation="2" result="coloredBlur" />
-                                <feMerge>
-                                    <feMergeNode in="coloredBlur" />
-                                    <feMergeNode in="SourceGraphic" />
-                                </feMerge>
-                            </filter>
                         </defs>
-                        {/* Grid Lines */}
                         <line x1="0" y1="20" x2="300" y2="20" stroke="#1f2937" strokeWidth="0.5" strokeDasharray="4 4"/>
                         <line x1="0" y1="60" x2="300" y2="60" stroke="#1f2937" strokeWidth="0.5" strokeDasharray="4 4"/>
                         <line x1="0" y1="100" x2="300" y2="100" stroke="#374151" strokeWidth="1"/>
-                        
                         {points.length > 1 && (
                             <>
                                 <polygon points={`0,100 ${polylinePoints} 300,100`} fill="url(#chartGradient)" />
-                                <polyline points={polylinePoints} fill="none" stroke="#00f0ff" strokeWidth="2" filter="url(#glow)" className="chart-glow" />
+                                <polyline points={polylinePoints} fill="none" stroke="#00f0ff" strokeWidth="2" className="chart-glow" />
                                 {points.map((p, i) => {
                                     const x = (i / (points.length - 1 || 1)) * 300;
                                     const y = 100 - (p[1] / maxVal) * 80;
@@ -259,6 +240,42 @@
                             </>
                         )}
                     </svg>
+                </div>
+            );
+        };
+
+        const TypeDistributionChart = ({ data }) => {
+            const counts = data.reduce((acc, curr) => {
+                const type = curr.method.split(' ')[0]; // Group loosely
+                acc[type] = (acc[type] || 0) + 1;
+                return acc;
+            }, {});
+
+            const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]).slice(0, 5); // Top 5
+            const maxVal = Math.max(...Object.values(counts)) || 1;
+
+            return (
+                <div className="w-full h-48 cyber-card rounded-xl p-6 relative overflow-hidden">
+                    <h4 className="text-sm font-bold text-cyber-red uppercase mb-4 tracking-wider flex items-center gap-2">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                        Threat Vector Distribution
+                    </h4>
+                    <div className="space-y-3">
+                        {sorted.map(([type, count]) => {
+                            const widthPercent = (count / maxVal) * 100;
+                            return (
+                                <div key={type} className="group">
+                                    <div className="flex justify-between text-[10px] uppercase font-bold text-slate-400 mb-1">
+                                        <span>{type}</span>
+                                        <span>{count}</span>
+                                    </div>
+                                    <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                                        <div className="h-full bg-cyber-red shadow-glow-red rounded-full transition-all duration-1000" style={{ width: `${widthPercent}%` }}></div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
             );
         };
@@ -277,9 +294,8 @@
                             <div className="text-xs uppercase text-slate-500 font-mono">ID: {date.replace(/-/g, '')}-CS-BRIEF</div>
                         </div>
                     </div>
-                    
                     {daysEvents.length === 0 ? (
-                        <div className="text-center py-16 italic text-slate-500 bg-slate-100 rounded-lg border border-dashed border-slate-300">No major incidents recorded for this date in the active feed. Return to the live dashboard for real-time monitoring.</div>
+                        <div className="text-center py-16 italic text-slate-500 bg-slate-100 rounded-lg border border-dashed border-slate-300">No major incidents recorded for this date.</div>
                     ) : (
                         <div className="space-y-8">
                             {daysEvents.map(evt => (
@@ -290,7 +306,7 @@
                                     </div>
                                     <div className="grid grid-cols-2 gap-y-2 gap-x-8 text-sm mb-4 text-slate-600">
                                         <div className="flex"><strong className="w-20 text-slate-900">Method:</strong> {evt.method}</div>
-                                        <div className="flex justify-end"><strong className="mr-2 text-slate-900">Source:</strong> {evt.source}</div>
+                                        <div className="flex justify-end"><strong className="mr-2 text-slate-900">Est. Loss:</strong> <span className="text-red-600 font-mono font-bold">{evt.cost}</span></div>
                                         <div className="col-span-2 mt-2"><strong className="block text-slate-900 mb-1">Impact Assessment:</strong> <span className="leading-relaxed">{evt.impact}</span></div>
                                     </div>
                                     <div className="bg-red-50 border-l-4 border-red-500 p-4 text-sm text-red-900 font-medium rounded-r-md">
@@ -301,9 +317,6 @@
                             ))}
                         </div>
                     )}
-                    <div className="mt-12 pt-6 border-t border-slate-200 text-xs text-center text-slate-400 font-mono uppercase tracking-wider">
-                        Generated by CyberSentinel v2.0 AI Core | Validated by SOC Team Alpha
-                    </div>
                 </div>
             );
         };
@@ -312,13 +325,16 @@
             const [view, setView] = useState('dashboard');
             const [searchTerm, setSearchTerm] = useState("");
             const [selectedEvent, setSelectedEvent] = useState(null);
+            
+            // PAGINATION STATE
+            const [currentPage, setCurrentPage] = useState(1);
+            const itemsPerPage = 10;
 
-            // State for Live Data
             const [liveData, setLiveData] = useState([]);
             const [isSyncing, setIsSyncing] = useState(false);
             const [lastUpdated, setLastUpdated] = useState("Never");
 
-            // --- LIVE FETCHING LOGIC (Unchanged) ---
+            // --- LIVE FETCHING LOGIC ---
             const fetchLiveFeeds = async () => {
                 setIsSyncing(true);
                 const allItems = [];
@@ -349,13 +365,13 @@
                                 method: method,
                                 attacker: attacker,
                                 impact: description.replace(/<[^>]*>?/gm, '').substring(0, 150) + "...",
-                                cost: "Undisclosed",
+                                cost: "Undisclosed", // Default for RSS
                                 remediation: "Review full source report for IOCs and patching instructions.",
                                 source: source.name,
                                 link: item.querySelector("link")?.textContent
                             });
                         });
-                    } catch (error) { /* Suppress error logging */ }
+                    } catch (error) { }
                 });
 
                 await Promise.all(fetchPromises);
@@ -365,17 +381,20 @@
                     allItems.push(...simulated);
                 }
 
-                // MERGE: Ensure Historical Data is preserved
                 const combined = [...allItems, ...HISTORICAL_DATA].sort((a, b) => new Date(b.date) - new Date(a.date));
                 setLiveData(combined);
                 setLastUpdated(new Date().toLocaleTimeString());
                 setIsSyncing(false);
             };
 
-            // Initial Fetch - This runs on every page load/refresh
             useEffect(() => {
                 fetchLiveFeeds();
             }, []);
+
+            // Pagination Reset
+            useEffect(() => {
+                setCurrentPage(1);
+            }, [searchTerm]);
 
             const filteredData = useMemo(() => {
                 return liveData.filter(item => 
@@ -385,6 +404,14 @@
                     item.date.includes(searchTerm)
                 );
             }, [liveData, searchTerm]);
+
+            // Pagination Logic
+            const indexOfLastItem = currentPage * itemsPerPage;
+            const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+            const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+            const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
             return (
                 <div className="min-h-screen pb-12 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-cyber-slate via-cyber-dark to-black">
@@ -450,9 +477,13 @@
 
                             {/* Main Content Grid */}
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                                {/* Left Column: Chart & Table */}
+                                {/* Left Column: Charts & Table */}
                                 <div className="lg:col-span-2 space-y-6">
-                                    <TrendChart data={liveData} />
+                                    {/* Charts Grid */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <TrendChart data={liveData} />
+                                        <TypeDistributionChart data={liveData} />
+                                    </div>
                                     
                                     {/* Search & Controls */}
                                     <div className="flex gap-4 items-center p-1 bg-slate-900/50 rounded-lg border border-slate-800/50">
@@ -460,26 +491,25 @@
                                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                                 <svg className="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                                             </div>
-                                            <input type="text" placeholder="Search archived logs & live feeds..." className="w-full pl-10 pr-4 py-3 bg-transparent text-sm text-white font-mono focus:outline-none border-none focus:ring-0 placeholder-slate-600" onChange={(e) => setSearchTerm(e.target.value)} />
+                                            <input type="text" placeholder="Search logs (target, vector, cost)..." className="w-full pl-10 pr-4 py-3 bg-transparent text-sm text-white font-mono focus:outline-none border-none focus:ring-0 placeholder-slate-600" onChange={(e) => setSearchTerm(e.target.value)} />
                                         </div>
-                                        {isSyncing && <span className="text-xs text-cyber-blue font-mono animate-pulse pr-4">Updating...</span>}
                                     </div>
 
                                     {/* Data Table */}
-                                    <div className="cyber-card rounded-xl overflow-hidden shadow-screen">
+                                    <div className="cyber-card rounded-xl overflow-hidden shadow-screen flex flex-col">
                                         <div className="overflow-x-auto">
                                             <table className="w-full text-left text-sm">
                                                 <thead className="bg-[#0a0f1d] text-slate-400 uppercase text-[11px] font-bold tracking-wider border-b border-slate-800">
                                                     <tr>
                                                         <th className="p-5">Timestamp</th>
-                                                        <th className="p-5">Target Entity / Sector</th>
+                                                        <th className="p-5">Target / Sector</th>
                                                         <th className="p-5">Attack Vector</th>
-                                                        <th className="p-5">Intel Source</th>
+                                                        <th className="p-5">Financial Impact</th>
                                                         <th className="p-5 text-right">Details</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-slate-800/50 font-mono">
-                                                    {filteredData.slice(0, 500).map(row => (
+                                                    {currentItems.map(row => (
                                                         <tr key={row.id} className="hover:bg-cyber-blue/5 transition-all group">
                                                             <td className="p-5 text-cyber-blue whitespace-nowrap">{row.date}</td>
                                                             <td className="p-5 font-sans">
@@ -494,9 +524,8 @@
                                                                 }`}>{row.method}</span>
                                                             </td>
                                                             <td className="p-5">
-                                                                <span className="text-xs text-slate-400 flex items-center gap-1">
-                                                                    <span className="w-1.5 h-1.5 rounded-full bg-cyber-green shadow-glow-green"></span>
-                                                                    {row.source}
+                                                                <span className={`font-bold ${row.cost.includes('$') || row.cost.includes('Million') ? 'text-cyber-yellow' : 'text-slate-500'}`}>
+                                                                    {row.cost}
                                                                 </span>
                                                             </td>
                                                             <td className="p-5 text-right">
@@ -509,12 +538,33 @@
                                                 </tbody>
                                             </table>
                                         </div>
+                                        {/* Pagination Controls */}
+                                        <div className="bg-[#0a0f1d] border-t border-slate-800 p-4 flex justify-between items-center">
+                                            <div className="text-xs text-slate-500 font-mono">
+                                                Showing <span className="text-white">{indexOfFirstItem + 1}</span> to <span className="text-white">{Math.min(indexOfLastItem, filteredData.length)}</span> of <span className="text-white">{filteredData.length}</span> entries
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <button 
+                                                    onClick={() => paginate(currentPage - 1)} 
+                                                    disabled={currentPage === 1}
+                                                    className="px-3 py-1 text-xs font-bold uppercase bg-slate-800 text-slate-300 border border-slate-700 hover:border-cyber-blue disabled:opacity-50 disabled:hover:border-slate-700 transition-all rounded-sm"
+                                                >
+                                                    Previous
+                                                </button>
+                                                <button 
+                                                    onClick={() => paginate(currentPage + 1)} 
+                                                    disabled={currentPage === totalPages}
+                                                    className="px-3 py-1 text-xs font-bold uppercase bg-slate-800 text-slate-300 border border-slate-700 hover:border-cyber-blue disabled:opacity-50 disabled:hover:border-slate-700 transition-all rounded-sm"
+                                                >
+                                                    Next
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
                                 {/* Right Column: Sidebar */}
                                 <div className="space-y-6">
-                                    {/* Live Feed Status Widget */}
                                     <div className="cyber-card p-6 rounded-xl border-t-4 border-cyber-green relative overflow-hidden">
                                         <div className="absolute inset-0 bg-cyber-green/5 animate-pulse pointer-events-none"></div>
                                         <h4 className="text-sm font-bold text-cyber-green uppercase mb-4 tracking-wider flex items-center gap-2">
@@ -532,7 +582,6 @@
                                                 </li>
                                             ))}
                                         </ul>
-                                        {/* THE ANSWER TO YOUR QUESTION IS HERE */}
                                         <div className="p-4 bg-[#0a0f1d] rounded-md border border-cyber-blue/30 text-xs text-slate-400 leading-relaxed shadow-screen font-mono">
                                             <strong className="block text-cyber-blue mb-2 uppercase tracking-wider">/// SYSTEM NOTE: AUTO-UPDATE ACTIVE</strong>
                                             This dashboard is connected to live RSS threat feeds. <strong>Refreshing this page will automatically fetch and display new incidents</strong> published today by the connected sources.
@@ -578,6 +627,10 @@
                                             <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Attack Vector</div>
                                             <div className="text-lg text-cyber-blue font-mono font-bold">{selectedEvent.method}</div>
                                         </div>
+                                         <div className="bg-[#0a0f1d] p-4 rounded-lg border border-slate-800 shadow-screen col-span-2">
+                                            <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Financial Impact</div>
+                                            <div className="text-lg text-cyber-yellow font-mono font-bold">{selectedEvent.cost}</div>
+                                        </div>
                                     </div>
 
                                     <div>
@@ -585,11 +638,6 @@
                                         <div className="bg-slate-900/80 p-5 rounded-lg border border-slate-700/50 text-slate-300 text-sm leading-relaxed font-mono shadow-screen">
                                             {selectedEvent.impact}
                                         </div>
-                                        {selectedEvent.link && (
-                                            <a href={selectedEvent.link} target="_blank" className="inline-flex items-center gap-2 text-cyber-blue hover:text-white text-xs mt-4 font-bold uppercase tracking-wider transition-colors border-b border-cyber-blue/30 hover:border-cyber-blue pb-1">
-                                                View Source Intelligence <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-                                            </a>
-                                        )}
                                     </div>
 
                                     <div>
