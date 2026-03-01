@@ -1,6 +1,9 @@
-# 🛡️ CyberSecurity Dashboard
+# 🛡️ CyberSecurity Dashboard 
 
 An interactive, real-time threat intelligence dashboard designed to monitor, filter, and analyze global cybersecurity incidents.
+
+## 🌐 Live Demo
+Check out the live dashboard here: [**View Live Dashboard**](https://sulimanal1.github.io/Cyber-Security-Dashboard/)
 
 ## 📝 Project Overview
 This project is a high-performance web application that aggregates live security feeds from top-tier intelligence sources (like CISA, BleepingComputer, and SANS ISC). It transforms raw XML/RSS data into actionable insights, featuring automated incident analysis and professional security briefings.
@@ -27,18 +30,15 @@ This project is a high-performance web application that aggregates live security
 Since this is a standalone React-powered HTML application, no complex installation is required:
 1.  Clone the repository:
     ```bash
-    git clone [https://github.com/your-username/cyber-dashboard-v2.5.git](https://github.com/your-username/cyber-dashboard-v2.5.git)
+    git clone [https://github.com/sulimanal1/Cyber-Security-Dashboard.git](https://github.com/sulimanal1/Cyber-Security-Dashboard.git)
     ```
 2.  Open the `index.html` file in any modern web browser.
-3.  The dashboard will automatically begin syncing with live security feeds.
 
 ## 🎓 Academic Context
 Developed as part of the **Security and Networks** specialization at **Zayed University**, focusing on automated security monitoring and threat visualization.
 
----
-Developed by **Sulaiman Alhabsi** 🚀
-
----
-
 ## 📜 License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+Developed by **Sulaiman Alhabsi** 🚀
