@@ -37,3 +37,8 @@ Developed as part of the **Security and Networks** specialization at **Zayed Uni
 
 ---
 Developed by **Sulaiman Alhabsi** 🚀
+
+---
+
+## 📜 License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
